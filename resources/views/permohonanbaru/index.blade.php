@@ -16,7 +16,7 @@
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h5 class="m-0 font-weight-bold">Permohonan Baru</h5>
+            <h5 class="m-0 font-weight-bold">Daftar Permohonan Baru</h5>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -27,18 +27,10 @@
                             <th>Email</th>
                             <th>Status</th>
                             <th>Jam Masuk</th>
+                            <th>Jam Keluar</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tfoot>
-                        <tr>
-                            <th>Nama Pemohon</th>
-                            <th>Email</th>
-                            <th>Status</th>
-                            <th>Jam Masuk</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </tfoot>
                     <tbody>
                         @foreach ($data as $item)
                         <tr>
@@ -46,6 +38,7 @@
                             <td>{{ $item->email }}</td>
                             <td>{{ $item->status ?? 'Menunggu' }}</td>
                             <td>{{ $item->jam_masuk }}</td>
+                            <td>{{ $item->jam_keluar }}</td>
                             <td>
                                 <a class="btn btn-primary btn-sm" href="{{ route('permohonanbaru.show', ['id' => $item->id]) }}">Detail</a>
                                 
@@ -69,6 +62,7 @@
                                     <input type="hidden" name="status" value="permohonan_selesai">
                                     <button type="submit" class="btn btn-success btn-sm">Pindah ke Selesai</button>
                                 </form>
+                                
                             </td>
                         </tr>
                         @endforeach

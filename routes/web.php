@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataMasukController;
+use App\Http\Controllers\LoginController;
+
 
 Route::get('/', function () {
     return view('dashboard');
@@ -52,4 +54,28 @@ Route::get('/permohonanproses', [DataMasukController::class, 'permohonanProses']
 Route::get('/permohonanproses/{id}', [DataMasukController::class, 'showProses'])->name('permohonanproses.show');
 
 Route::get('/permohonanselesai', [DataMasukController::class, 'permohonanSelesai'])->name('permohonanselesai.index');
+Route::get('/permohonanselesai/{id}', [DataMasukController::class, 'showSelesai'])->name('permohonanselesai.show');
+// Contoh definisi yang benar
+Route::post('/permohonanselesai/upload', [DataMasukController::class, 'upload'])->name('permohonanselesai.upload');
+
+
+
+Route::get('/permohonantolak', [DataMasukController::class,'permohonantolak'])->name('permohonantolak.index');
+Route::get('/permohonantolak/{id}', [DataMasukController::class, 'showTolak'])->name('permohonantolak.show');
+// Route untuk menampilkan detail permohonan berdasarkan email
+Route::get('/permohonan/detail/{email}', [DataMasukController::class, 'showByEmail'])->name('permohonan.detail');
+
 Route::post('/permohonan/change-status/{id}', [DataMasukController::class, 'changeStatus'])->name('permohonan.changeStatus');
+
+
+
+
+
+// Menampilkan form login
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+
+// Proses login
+Route::post('/login', [LoginController::class, 'login']);
+
+// Proses logout
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

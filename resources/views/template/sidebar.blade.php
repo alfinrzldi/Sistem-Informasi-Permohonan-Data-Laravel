@@ -14,7 +14,7 @@
 
     <!-- Nav Item - Dashboard -->
     <li class="nav-item active">
-        <a class="nav-link" href="{{ url('/') }}">
+        <a class="nav-link" href="{{ url('/dashboard') }}">
             <i class="fas fa-fw fa-tachometer-alt" style="color: white;"></i>
             <span style="color: white;">Dashboard</span></a>
     </li>
@@ -63,4 +63,18 @@
             <i class="fas fa-fw fa-table" style="color: white;"></i>
             <span style="color: white;">Permohonan Selesai</span></a>
     </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url('/permohonantolak') }}">
+            <i class="fas fa-fw fa-table" style="color: white;"></i>
+            <span style="color: white;">Permohonan DiTolak</span></a>
+    </li>
+
+    <!-- Tambahkan Permohonan Anda -->
+    <li class="nav-item">
+        {{-- <a class="nav-link" href="{{ url('/permohonan/detail/' . auth()->user()->email) }}"> --}}
+            <i class="fas fa-fw fa-file-alt" style="color: white;"></i>
+            <span style="color: white;">Permohonan Anda</span></a>
+    </li>
+
 </ul>

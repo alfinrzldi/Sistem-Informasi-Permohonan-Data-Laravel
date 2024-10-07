@@ -32,11 +32,10 @@ class DataMasukController extends Controller
             'identitas' => 'required|string',
             'jenis_info' => 'required|string',
             'tujuan_info' => 'required|string',
-            'data' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'jam_masuk' => 'required|date',
             'jam_keluar' => 'required|date|after_or_equal:jam_masuk',
         ]);
-    
+        
         $data = new DataMasuk();
         $data->perusahaan = $request->perusahaan;
         $data->nama = $request->nama;
@@ -45,17 +44,35 @@ class DataMasukController extends Controller
         $data->identitas = $request->identitas;
         $data->jenis_info = $request->jenis_info;
         $data->tujuan_info = $request->tujuan_info;
-        $data->data = $request->file('data')->store('public/data'); 
         $data->jam_masuk = $request->jam_masuk;
         $data->jam_keluar = $request->jam_keluar;
     
+        // Set kolom data ke string kosong
+        $data->data = ''; // Atau null, jika kolom diperbolehkan null
+    
         // Set status default ke 'Menunggu'
         $data->status = 'Menunggu';
-    
+        
         $data->save();
-    
+        
         return redirect()->route('permohonanbaru.index')->with('success', 'Permohonan berhasil dibuat.');
     }
+    
+    public function showByEmail($email)
+{
+    // Ambil data berdasarkan email
+    $data = DataMasuk::where('email', $email)->first();
+
+    // Cek apakah data ditemukan
+    if (!$data) {
+        return redirect()->route('permohonanselesai.index')->with('error', 'Data tidak ditemukan.');
+    }
+
+    // Tampilkan view detail dengan data yang ditemukan
+    return view('permohonans.user.detail', compact('data'));
+}
+
+
     
 
 
@@ -82,7 +99,7 @@ public function update(Request $request, $id)
         'identitas' => 'required|string|max:255',
         'jenis_info' => 'required|string|max:255',
         'tujuan_info' => 'required|string|max:255',
-        'status' => 'required|in:Menunggu,Permohonan Dalam Proses,Permohonan Diterima',
+        'status' => 'required|in:Menunggu,Permohonan Dalam Proses,Permohonan Diterima, Permohonan Ditolak',
         'jam_masuk' => 'required|date',
         'jam_keluar' => 'required|date|after_or_equal:jam_masuk',
     ]);
@@ -104,6 +121,30 @@ public function update(Request $request, $id)
 
     return redirect()->route('permohonanbaru.index')->with('success', 'Permohonan berhasil diperbarui.');
 }
+
+public function upload(Request $request)
+{
+    $request->validate([
+        'id' => 'required|exists:data_masuk,id', // Pastikan ID dikirim melalui request
+        'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,jpg,png|max:2048',
+    ]);
+
+    // Proses upload file
+    if ($request->file('file')->isValid()) {
+        $file = $request->file('file');
+        $path = $file->store('uploads', 'public');
+
+        // Simpan informasi file ke dalam database
+        $data = DataMasuk::findOrFail($request->id);
+        $data->file_path = $path;
+        $data->save();
+    }
+
+    return redirect()->route('permohonanselesai.index')->with('success', 'File berhasil diunggah.');
+}
+
+
+
 
 
 
@@ -136,12 +177,27 @@ public function showSelesai($id)
     // Gunakan model yang benar, yaitu DataMasuk
     $data = DataMasuk::findOrFail($id);
     
-    // Pastikan status permohonan adalah 'selesai'
-    if ($data->status != 'permohonan_selesai') {
+    // Pastikan status permohonan adalah 'Permohonan Diterima'
+    if ($data->status != 'Permohonan Diterima') {
         abort(404); // Atau redirect ke halaman lain dengan pesan error
     }
 
     return view('permohonanselesai.detail', compact('data'));
+}
+
+
+
+public function showTolak($id)
+{
+    // Gunakan model yang benar, yaitu DataMasuk
+    $data = DataMasuk::findOrFail($id);
+    
+    // Pastikan status permohonan adalah 'selesai'
+    if ($data->status != 'Permohonan Ditolak') {
+        abort(404); // Atau redirect ke halaman lain dengan pesan error
+    }
+
+    return view('permohonantolak.detail', compact('data'));
 }
 
 
@@ -164,7 +220,7 @@ public function permohonanProses()
 
 public function permohonanSelesai()
 {
-    $data = DataMasuk::where('status', 'permohonan_selesai')->get();
+    $data = DataMasuk::where('status', 'Permohonan Diterima')->get();
 
     // Mapping status agar lebih deskriptif
     $data->transform(function ($item) {
@@ -178,6 +234,16 @@ public function permohonanSelesai()
 
     return view('permohonanselesai.index', compact('data'));
 }
+
+public function permohonanTolak()
+{
+    // Mengambil semua data dengan status 'Permohonan Ditolak'
+    $data = DataMasuk::where('status', 'Permohonan Ditolak')->get();
+
+    // Menampilkan data pada view 'permohonantolak.index'
+    return view('permohonantolak.index', compact('data'));
+}
+
 
 
 
